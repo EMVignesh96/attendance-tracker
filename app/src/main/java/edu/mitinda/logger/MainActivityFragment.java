@@ -33,8 +33,8 @@ import java.util.Arrays;
 public class MainActivityFragment extends Fragment {
 
     private ArrayAdapter<String> mCourseAdapter;
-    private ListView listView;
-    private String tregNo;
+    private static ListView listView;
+    private static String tregNo;
 
 
     public MainActivityFragment() {
