@@ -1,13 +1,27 @@
 package edu.mitinda.logger;
 
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -17,8 +31,15 @@ import java.util.Arrays;
 public class DetailsActivityFragment extends Fragment {
     ArrayAdapter<String> mStudentsAdapter;
     ListView listView;
+    String params[];
+    String teacherCourseId = null;
 
     public DetailsActivityFragment() {
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
     }
 
     @Override
