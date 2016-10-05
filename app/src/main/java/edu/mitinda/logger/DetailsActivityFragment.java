@@ -34,7 +34,7 @@ public class DetailsActivityFragment extends Fragment {
     String params[];
     String course;
     String tregNo;
-    String teacherCourseId = null;
+    public static String teacherCourseId = "8";
 
     public DetailsActivityFragment() {
     }
@@ -42,17 +42,26 @@ public class DetailsActivityFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        //updateTeacherCourseId();
         updateStudentNameListView();
+    }
+
+    private void updateTeacherCourseId() {
+        FetchTeacherTask teacherTask = new FetchTeacherTask();
+        Intent intent = getActivity().getIntent();
+        tregNo = intent.getStringExtra("tregNo");
+        course = intent.getStringExtra("course");
+        teacherTask.execute(new String[] {
+                course,
+                tregNo
+        });
     }
 
     private void updateStudentNameListView() {
         FetchStudentsTask studentsName = new FetchStudentsTask();
-        Intent intent = getActivity().getIntent();
-        tregNo = intent.getStringExtra("tregNo");
-        course = intent.getStringExtra("course");
+        //Intent intent = getActivity().getIntent();
         studentsName.execute(new String[] {
-                tregNo,
-                course
+                "8"
         });
     }
 
@@ -77,8 +86,104 @@ public class DetailsActivityFragment extends Fragment {
 
         return view;
     }
+////////////////////////////////////////////////////////////
+public class FetchTeacherTask extends AsyncTask<String[], Void, String[]> {
+
+    private String[] getTeacherCourseIdFromJson(String teacherCourseIdJsonString) {
+        String id[] = null;
+        try {
+            JSONArray jsonArray = new JSONArray(teacherCourseIdJsonString);
+            JSONObject jsonObject;
+            int length = jsonArray.length();
+            id = new String[length];
+
+            for(int i = 0 ; i < length; i++) {
+                jsonObject = jsonArray.getJSONObject(i);
+                id[i] = jsonObject.optString("teacherCourseId").toString();
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return id;
+    }
 
 
+    @Override
+    protected String[] doInBackground(String[]... params) {
+
+        if(params.length == 0) {
+            return null;
+        }
+
+        HttpURLConnection urlConnection = null;
+        URL url = null;
+        String teacherCourseIdJsonString = null;
+        BufferedReader reader = null;
+
+        try {
+            url = new URL("http://vmobilebase.hol.es/tracker/teacher-course-id.php?course=" + params[0] + "&tregNo=" + params[1]);
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.connect();
+            Log.v("adslfkjldkf", url.toString());
+
+            InputStream inputStream = urlConnection.getInputStream();
+            StringBuffer buffer = new StringBuffer();
+
+            if(inputStream == null) {
+                return null;
+            }
+
+            reader = new BufferedReader(new InputStreamReader(inputStream));
+            String line;
+
+            while((line = reader.readLine()) != null) {
+                buffer.append(line + "\n");
+            }
+
+            if(buffer.length() == 0) {
+                return null;
+            }
+
+            teacherCourseIdJsonString = buffer.toString();
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if(urlConnection != null) {
+                urlConnection.disconnect();
+            }
+
+            if(reader != null) {
+                try {
+                    reader.close();
+                } catch (Exception e) {
+
+                }
+            }
+        }
+
+        try {
+            return getTeacherCourseIdFromJson(teacherCourseIdJsonString);
+        }
+        catch (Exception e) {
+
+        }
+
+        return null;
+    }
+
+    @Override
+    protected void onPostExecute(String[] strings) {
+        super.onPostExecute(strings);
+        if(strings != null) {
+            teacherCourseId = strings[0];
+        }
+    }
+}
+/////////////////////////////////////////////////////////////
     public class FetchStudentsTask extends AsyncTask<String[], Void, String[]> {
 
         private String[] getStudentsFromJson(String studentJsonString) {
@@ -135,6 +240,7 @@ public class DetailsActivityFragment extends Fragment {
                 }
 
                 studentJsonString = buffer.toString();
+                Log.v("JSON String", studentJsonString);
 
             } catch (MalformedURLException e) {
                 e.printStackTrace();
@@ -169,10 +275,10 @@ public class DetailsActivityFragment extends Fragment {
             super.onPostExecute(strings);
             if(strings != null) {
                 mStudentsAdapter.clear();
-                int i = 0;
+                //int i = 0;
                 for(String name : strings) {
                     mStudentsAdapter.add(name);
-                    Log.v("Helloooooooo", mStudentsAdapter.getItem(i++));
+                    //Log.v("Helloooooooo", mStudentsAdapter.getItem(i++));
                 }
             }
         }
