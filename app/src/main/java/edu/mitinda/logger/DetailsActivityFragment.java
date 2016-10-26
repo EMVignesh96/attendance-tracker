@@ -42,19 +42,20 @@ public class DetailsActivityFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        //updateTeacherCourseId();
+        Intent intent = getActivity().getIntent();
+        tregNo = intent.getStringExtra("tregNo");
+        course = intent.getStringExtra("course");
+        //Log.v("HHHHHHHHHHH", course + " " + tregNo);
+        updateTeacherCourseId();
         updateStudentNameListView();
     }
 
     private void updateTeacherCourseId() {
         FetchTeacherTask teacherTask = new FetchTeacherTask();
-        Intent intent = getActivity().getIntent();
-        tregNo = intent.getStringExtra("tregNo");
-        course = intent.getStringExtra("course");
-        teacherTask.execute(new String[] {
-                course,
-                tregNo
-        });
+        String [] tregNoCourse = new String[2];
+        tregNoCourse[0] = course;
+        tregNoCourse[1] = tregNo;
+        teacherTask.execute(tregNoCourse);
     }
 
     private void updateStudentNameListView() {
@@ -87,20 +88,14 @@ public class DetailsActivityFragment extends Fragment {
         return view;
     }
 ////////////////////////////////////////////////////////////
-public class FetchTeacherTask extends AsyncTask<String[], Void, String[]> {
+public class FetchTeacherTask extends AsyncTask<String[] , Void, Void> {
 
     private String[] getTeacherCourseIdFromJson(String teacherCourseIdJsonString) {
         String id[] = null;
         try {
-            JSONArray jsonArray = new JSONArray(teacherCourseIdJsonString);
-            JSONObject jsonObject;
-            int length = jsonArray.length();
-            id = new String[length];
-
-            for(int i = 0 ; i < length; i++) {
-                jsonObject = jsonArray.getJSONObject(i);
-                id[i] = jsonObject.optString("teacherCourseId").toString();
-            }
+            JSONObject jsonObject = new JSONObject(teacherCourseIdJsonString);//JSONArray jsonArray = new JSONArray(teacherCourseIdJsonString);
+            teacherCourseId = jsonObject.getString("teacherCourseId");
+            Log.v("HHHHHHHHHHHH", teacherCourseId + " " + teacherCourseIdJsonString);
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -110,8 +105,7 @@ public class FetchTeacherTask extends AsyncTask<String[], Void, String[]> {
 
 
     @Override
-    protected String[] doInBackground(String[]... params) {
-
+    protected Void doInBackground(String[]... params) {
         if(params.length == 0) {
             return null;
         }
@@ -122,7 +116,8 @@ public class FetchTeacherTask extends AsyncTask<String[], Void, String[]> {
         BufferedReader reader = null;
 
         try {
-            url = new URL("http://vmobilebase.hol.es/tracker/teacher-course-id.php?course=" + params[0] + "&tregNo=" + params[1]);
+            //Log.v("PARAMSSSSSSSS", params[0][0] + " " + params[0][1]);
+            url = new URL("http://vmobilebase.hol.es/tracker/teacher-course-id.php?course=" + params[0][0] + "&tregNo=" + params[0][1]);
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.connect();
             Log.v("adslfkjldkf", url.toString());
@@ -166,7 +161,7 @@ public class FetchTeacherTask extends AsyncTask<String[], Void, String[]> {
         }
 
         try {
-            return getTeacherCourseIdFromJson(teacherCourseIdJsonString);
+            getTeacherCourseIdFromJson(teacherCourseIdJsonString);
         }
         catch (Exception e) {
 
@@ -176,11 +171,9 @@ public class FetchTeacherTask extends AsyncTask<String[], Void, String[]> {
     }
 
     @Override
-    protected void onPostExecute(String[] strings) {
-        super.onPostExecute(strings);
-        if(strings != null) {
-            teacherCourseId = strings[0];
-        }
+    protected void onPostExecute(Void aVoid) {
+        super.onPostExecute(aVoid);
+        //Log.v("TTTTTTTTTTTTTT", teacherCourseId);
     }
 }
 /////////////////////////////////////////////////////////////
