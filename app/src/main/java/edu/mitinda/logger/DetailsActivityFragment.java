@@ -63,7 +63,10 @@ public class DetailsActivityFragment extends Fragment {
         /*studentsName.execute(new String[] {
                 "8"
         });*/
-        studentsName.execute(teacherCourseId);
+        String [] teacherCId = new String [2];
+        teacherCId[0] = "haha";
+        teacherCId[1] = teacherCourseId + "";
+        studentsName.execute(teacherCId);
     }
 
     @Override
@@ -88,14 +91,14 @@ public class DetailsActivityFragment extends Fragment {
         return view;
     }
 ////////////////////////////////////////////////////////////
-public class FetchTeacherTask extends AsyncTask<String[] , Void, Void> {
+public class FetchTeacherTask extends AsyncTask<String[] , Void, String[]> {
 
     private String[] getTeacherCourseIdFromJson(String teacherCourseIdJsonString) {
         String id[] = null;
         try {
             JSONObject jsonObject = new JSONObject(teacherCourseIdJsonString);//JSONArray jsonArray = new JSONArray(teacherCourseIdJsonString);
             teacherCourseId = jsonObject.getString("teacherCourseId");
-            //Log.v("HHHHHHHHHHHH", teacherCourseId + " " + teacherCourseIdJsonString);
+            Log.v("HHHHHHHHHHHH", teacherCourseId + " " + teacherCourseIdJsonString);
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -105,7 +108,7 @@ public class FetchTeacherTask extends AsyncTask<String[] , Void, Void> {
 
 
     @Override
-    protected Void doInBackground(String[]... params) {
+    protected String[] doInBackground(String[]... params) {
         if(params.length == 0) {
             return null;
         }
@@ -171,13 +174,13 @@ public class FetchTeacherTask extends AsyncTask<String[] , Void, Void> {
     }
 
     @Override
-    protected void onPostExecute(Void aVoid) {
-        super.onPostExecute(aVoid);
-        //Log.v("TTTTTTTTTTTTTT", teacherCourseId);
+    protected void onPostExecute(String[] strings) {
+        super.onPostExecute(strings);
+        Log.v("QQQQQQQQQQ", teacherCourseId);
     }
 }
 /////////////////////////////////////////////////////////////
-    public class FetchStudentsTask extends AsyncTask<String, Void, String[]> {
+    public class FetchStudentsTask extends AsyncTask<String[], Void, String[]> {
 
         private String[] getStudentsFromJson(String studentJsonString) {
             String name[] = null;
@@ -204,73 +207,77 @@ public class FetchTeacherTask extends AsyncTask<String[] , Void, Void> {
             return list;
         }
 
-        @Override
-        protected String[] doInBackground(String... params) {
-            if(params.length == 0) {
+    @Override
+    protected String[] doInBackground(String[]... params) {
+        if(params.length == 0) {
+            //Log.v("ZZZZZZZZZZZ", params[0]);
+            return null;
+        }
+        String tcid = params[0][1];
+
+        Log.v("ZZZZZZZZZZZ", tcid);
+
+        HttpURLConnection urlConnection = null;
+        URL url = null;
+        String studentJsonString = null;
+        BufferedReader reader = null;
+
+        try {
+            //Log.v("SSSSSSSSSSSSSS", params[0]);
+            url = new URL("http://vmobilebase.hol.es/tracker/select-students.php?teacherCourseId=" + params[0][1]);
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.connect();
+
+            InputStream inputStream = urlConnection.getInputStream();
+            StringBuffer buffer = new StringBuffer();
+
+            if(inputStream == null) {
                 return null;
             }
 
-            HttpURLConnection urlConnection = null;
-            URL url = null;
-            String studentJsonString = null;
-            BufferedReader reader = null;
+            reader = new BufferedReader(new InputStreamReader(inputStream));
+            String line;
 
-            try {
-                Log.v("SSSSSSSSSSSSSS", params[0]);
-                url = new URL("http://vmobilebase.hol.es/tracker/select-students.php?teacherCourseId=" + params[0]);
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.connect();
-
-                InputStream inputStream = urlConnection.getInputStream();
-                StringBuffer buffer = new StringBuffer();
-
-                if(inputStream == null) {
-                    return null;
-                }
-
-                reader = new BufferedReader(new InputStreamReader(inputStream));
-                String line;
-
-                while((line = reader.readLine()) != null) {
-                    buffer.append(line + "\n");
-                }
-
-                if(buffer.length() == 0) {
-                    return null;
-                }
-
-                studentJsonString = buffer.toString();
-                Log.v("JSON String", studentJsonString);
-
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                if(urlConnection != null) {
-                    urlConnection.disconnect();
-                }
-
-                if(reader != null) {
-                    try {
-                        reader.close();
-                    } catch (Exception e) {
-
-                    }
-                }
+            while((line = reader.readLine()) != null) {
+                buffer.append(line + "\n");
             }
 
-            try {
-                return getStudentsFromJson(studentJsonString);
-            }
-            catch (Exception e) {
-
+            if(buffer.length() == 0) {
+                return null;
             }
 
-            return null;
+            studentJsonString = buffer.toString();
+            Log.v("JSON String", studentJsonString);
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if(urlConnection != null) {
+                urlConnection.disconnect();
+            }
+
+            if(reader != null) {
+                try {
+                    reader.close();
+                } catch (Exception e) {
+
+                }
+            }
         }
 
-        @Override
+        try {
+            return getStudentsFromJson(studentJsonString);
+        }
+        catch (Exception e) {
+
+        }
+
+        return null;
+    }
+
+    @Override
         protected void onPostExecute(String[] strings) {
             super.onPostExecute(strings);
             if(strings != null) {
