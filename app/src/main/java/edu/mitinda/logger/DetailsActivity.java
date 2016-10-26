@@ -25,6 +25,7 @@ public class DetailsActivity extends AppCompatActivity {
                 /*Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();*/
                 Intent intent = new Intent(DetailsActivity.this, LogActivity.class);
+                intent.putExtra("teacherCourseId", DetailsActivityFragment.teacherCourseId);
                 startActivity(intent);
             }
         });

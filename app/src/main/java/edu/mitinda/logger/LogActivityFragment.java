@@ -1,5 +1,6 @@
 package edu.mitinda.logger;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -32,6 +33,7 @@ import static edu.mitinda.logger.DetailsActivityFragment.teacherCourseId;
 public class LogActivityFragment extends Fragment {
     private ArrayAdapter<String> mNameAdapter;
     private ListView listView;
+    private static String teacherCourseId;
     private int mSelectedItem = -1;
 
     @Override
@@ -44,6 +46,8 @@ public class LogActivityFragment extends Fragment {
     }
 
     private void updateList() {
+        Intent intent = getActivity().getIntent();
+        teacherCourseId = intent.getStringExtra("teacherCourseId");
         FetchStudentsNameTask studentsNameTask = new FetchStudentsNameTask();
         String [] teacherCId = new String [2];
         teacherCId[0] = "haha";

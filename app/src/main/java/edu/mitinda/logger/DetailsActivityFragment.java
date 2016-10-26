@@ -72,6 +72,11 @@ public class DetailsActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+
+        onStart();
+
+
         View view =  inflater.inflate(R.layout.fragment_details, container, false);
 
         mStudentsAdapter = new ArrayAdapter<String>(getActivity(), R.layout.details_listitem_textview,
@@ -168,6 +173,7 @@ public class FetchTeacherTask extends AsyncTask<String[] , Void, String[]> {
     protected void onPostExecute(String[] strings) {
         super.onPostExecute(strings);
         Log.v("QQQQQQQQQQ", teacherCourseId);
+        mStudentsAdapter.notifyDataSetChanged();/**/
     }
 }
 /////////////////////////////////////////////////////////////
@@ -177,19 +183,22 @@ public class FetchTeacherTask extends AsyncTask<String[] , Void, String[]> {
             String name[] = null;
             String rollNo[] = null;
             String list[] = null;
+            String percentage[] = null;
             try {
                 JSONArray jsonArray = new JSONArray(studentJsonString);
                 JSONObject jsonObject;
                 int length = jsonArray.length();
                 name = new String[length];
                 rollNo = new String [length];
+                percentage = new String[length];
                 list = new String[length];
 
                 for(int i = 0 ; i < length; i++) {
                     jsonObject = jsonArray.getJSONObject(i);
                     rollNo[i] = jsonObject.getString("regNo");
                     name[i] = jsonObject.optString("name").toString();
-                    list[i] = rollNo[i] + "\t\t" + name[i];
+                    percentage[i] = jsonObject.getString("percentAttended");
+                    list[i] = rollNo[i] + "\t\t" + name[i] + "\t\t\t\t\t\t\t\t" + percentage[i];
                 }
 
             } catch (JSONException e) {
@@ -215,7 +224,7 @@ public class FetchTeacherTask extends AsyncTask<String[] , Void, String[]> {
 
         try {
             //Log.v("SSSSSSSSSSSSSS", params[0]);
-            url = new URL("http://vmobilebase.hol.es/tracker/select-students.php?teacherCourseId=" + params[0][1]);
+            url = new URL("http://vmobilebase.hol.es/tracker/select-students-with-percent.php?teacherCourseId=" + params[0][1]);
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.connect();
 
