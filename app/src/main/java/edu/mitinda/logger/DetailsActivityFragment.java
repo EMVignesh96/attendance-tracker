@@ -45,7 +45,6 @@ public class DetailsActivityFragment extends Fragment {
         Intent intent = getActivity().getIntent();
         tregNo = intent.getStringExtra("tregNo");
         course = intent.getStringExtra("course");
-        //Log.v("HHHHHHHHHHH", course + " " + tregNo);
         updateTeacherCourseId();
         updateStudentNameListView();
     }
@@ -181,22 +180,28 @@ public class FetchTeacherTask extends AsyncTask<String[] , Void, Void> {
     public class FetchStudentsTask extends AsyncTask<String, Void, String[]> {
 
         private String[] getStudentsFromJson(String studentJsonString) {
-            String course[] = null;
+            String name[] = null;
+            String rollNo[] = null;
+            String list[] = null;
             try {
                 JSONArray jsonArray = new JSONArray(studentJsonString);
                 JSONObject jsonObject;
                 int length = jsonArray.length();
-                course = new String[length];
+                name = new String[length];
+                rollNo = new String [length];
+                list = new String[length];
 
                 for(int i = 0 ; i < length; i++) {
                     jsonObject = jsonArray.getJSONObject(i);
-                    course[i] = jsonObject.optString("name").toString();
+                    rollNo[i] = jsonObject.getString("regNo");
+                    name[i] = jsonObject.optString("name").toString();
+                    list[i] = rollNo[i] + "\t\t" + name[i];
                 }
 
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            return course;
+            return list;
         }
 
         @Override
