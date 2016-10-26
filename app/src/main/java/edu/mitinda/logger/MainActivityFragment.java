@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -92,21 +93,28 @@ public class MainActivityFragment extends Fragment {
 
         private String[] getCoursesDataFromJson(String coursesJsonString) {
             String course[] = null;
+            String courseName[] = null;
+            String list[] = null;
             try {
+                Log.v("JJJJJJJJJJJJ", coursesJsonString);
                 JSONArray jsonArray = new JSONArray(coursesJsonString);
                 JSONObject jsonObject;
                 int length = jsonArray.length();
                 course = new String[length];
+                courseName = new String [length];
+                list = new String[length];
 
                 for(int i = 0 ; i < length; i++) {
                     jsonObject = jsonArray.getJSONObject(i);
-                    course[i] = jsonObject.optString("course").toString();
+                    course[i] = jsonObject.getString("course");
+                    courseName[i] = jsonObject.getString("name");
+                    list[i] = course[i]/* + " | " + courseName[i]*/;
                 }
 
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            return course;
+            return list;
         }
 
 

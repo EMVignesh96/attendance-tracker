@@ -74,15 +74,6 @@ public class DetailsActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view =  inflater.inflate(R.layout.fragment_details, container, false);
 
-        String data[] = {
-                "2014506022\t\t100%",
-                "2014506035\t\t50%",
-                "2014506059\t\t80%",
-                "2014506060\t\t96%",
-                "2014506061\t\t50%"
-        };
-        ArrayList<String> students = new ArrayList<String>(Arrays.asList(data));
-
         mStudentsAdapter = new ArrayAdapter<String>(getActivity(), R.layout.details_listitem_textview,
                 R.id.details_textview, new ArrayList<String>());
         listView = (ListView) view.findViewById(R.id.details_listview);
