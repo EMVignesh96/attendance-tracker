@@ -11,6 +11,12 @@
     android:orientation="vertical"
     tools:context="edu.mitinda.logger.LogActivityFragment"
     tools:showIn="@layout/activity_log">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Check the absentees"
+        android:textAllCaps="true"
+        />
 
     <ListView
         android:layout_width="match_parent"
