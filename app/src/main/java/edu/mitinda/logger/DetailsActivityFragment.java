@@ -34,7 +34,7 @@ public class DetailsActivityFragment extends Fragment {
     String params[];
     String course;
     String tregNo;
-    public static String teacherCourseId = "8";
+    public static String teacherCourseId;
 
     public DetailsActivityFragment() {
     }
@@ -61,9 +61,10 @@ public class DetailsActivityFragment extends Fragment {
     private void updateStudentNameListView() {
         FetchStudentsTask studentsName = new FetchStudentsTask();
         //Intent intent = getActivity().getIntent();
-        studentsName.execute(new String[] {
+        /*studentsName.execute(new String[] {
                 "8"
-        });
+        });*/
+        studentsName.execute(teacherCourseId);
     }
 
     @Override
@@ -95,7 +96,7 @@ public class FetchTeacherTask extends AsyncTask<String[] , Void, Void> {
         try {
             JSONObject jsonObject = new JSONObject(teacherCourseIdJsonString);//JSONArray jsonArray = new JSONArray(teacherCourseIdJsonString);
             teacherCourseId = jsonObject.getString("teacherCourseId");
-            Log.v("HHHHHHHHHHHH", teacherCourseId + " " + teacherCourseIdJsonString);
+            //Log.v("HHHHHHHHHHHH", teacherCourseId + " " + teacherCourseIdJsonString);
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -177,7 +178,7 @@ public class FetchTeacherTask extends AsyncTask<String[] , Void, Void> {
     }
 }
 /////////////////////////////////////////////////////////////
-    public class FetchStudentsTask extends AsyncTask<String[], Void, String[]> {
+    public class FetchStudentsTask extends AsyncTask<String, Void, String[]> {
 
         private String[] getStudentsFromJson(String studentJsonString) {
             String course[] = null;
@@ -199,7 +200,7 @@ public class FetchTeacherTask extends AsyncTask<String[] , Void, Void> {
         }
 
         @Override
-        protected String[] doInBackground(String[]... params) {
+        protected String[] doInBackground(String... params) {
             if(params.length == 0) {
                 return null;
             }
@@ -210,6 +211,7 @@ public class FetchTeacherTask extends AsyncTask<String[] , Void, Void> {
             BufferedReader reader = null;
 
             try {
+                Log.v("SSSSSSSSSSSSSS", params[0]);
                 url = new URL("http://vmobilebase.hol.es/tracker/select-students.php?teacherCourseId=" + params[0]);
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.connect();
